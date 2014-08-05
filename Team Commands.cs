@@ -38,17 +38,19 @@ namespace TeamCommands {
                 case "green": return 2;
                 case "blue": return 3;
                 case "yellow": return 4;
+                case "all": return 5;
                 default: return who.Team;
             }
         }
 
         string TeamIDToColor(int ID) {
             switch (ID) {
-                case 0: return "white";
-                case 1: return "red";
-                case 2: return "green";
-                case 3: return "blue";
-                case 4: return "yellow";
+                case 0: return "the white team";
+                case 1: return "the red team";
+                case 2: return "the green team";
+                case 3: return "the blue team";
+                case 4: return "the yellow team";
+                case 5: return "everyone";
                 default: return "";
             }
         }
@@ -64,7 +66,7 @@ namespace TeamCommands {
                             string reason = e.Parameters.Count > 2 ? String.Join(" ", e.Parameters.Skip(2)) : "Misbehavior.";
                             var team = TeamColorToID(e.Parameters[1], e.Player);
                             foreach (TSPlayer player in TShock.Players)
-                                if (player != null && team == player.Team)
+                                if (player != null && (team == player.Team || team == 5))
                                     TShock.Utils.Kick(player, reason, !e.Player.RealPlayer, true, e.Player.Name);
                             TShock.Utils.Broadcast(string.Format("The {0} team was kicked for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                         }
@@ -75,7 +77,7 @@ namespace TeamCommands {
                         string reason = e.Parameters.Count > 2 ? String.Join(" ", e.Parameters.Skip(2)) : "Misbehavior.";
                         var team = TeamColorToID(e.Parameters[1], e.Player);
                         foreach (TSPlayer player in TShock.Players)
-                            if (player != null && team == player.Team && (!player.Group.HasPermission(Permissions.immunetoban) || e.Player.RealPlayer)) {
+                            if (player != null && (team == player.Team || team == 5) && (!player.Group.HasPermission(Permissions.immunetoban) || e.Player.RealPlayer)) {
                                 var user = TShock.Users.GetUserByID(player.Index);
                                 var knownIps = JsonConvert.DeserializeObject<List<string>>(user.KnownIps);
                                 TShock.Bans.AddBan(knownIps.Last(), user.Name, user.UUID, reason, false, e.Player.UserAccountName);
@@ -95,7 +97,7 @@ namespace TeamCommands {
                         string reason = e.Parameters.Count > 3 ? String.Join(" ", e.Parameters.Skip(3)) : "Misbehavior.";
                         var team = TeamColorToID(e.Parameters[1], e.Player);
                         foreach (TSPlayer player in TShock.Players)
-                                if (player != null && team == player.Team && (!player.Group.HasPermission(Permissions.immunetoban) || e.Player.RealPlayer))
+                            if (player != null && (team == player.Team || team == 5) && (!player.Group.HasPermission(Permissions.immunetoban) || e.Player.RealPlayer))
                                     if (TShock.Bans.AddBan(player.IP, player.Name, player.UUID, reason, false, e.Player.Name, DateTime.UtcNow.AddSeconds(time).ToString("s")))
                                         player.Disconnect(String.Format("Banned: {0}", reason));
                         TShock.Utils.Broadcast(string.Format("The {0} team was banned for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
@@ -107,7 +109,7 @@ namespace TeamCommands {
                         string reason = e.Parameters.Count > 3 ? String.Join(" ", e.Parameters.Skip(3)) : "Misbehavior.";
                         var team = TeamColorToID(e.Parameters[1], e.Player);
                         foreach (TSPlayer player in TShock.Players)
-                            if (player != null && team == player.Team && !player.Group.HasPermission(Permissions.mute))
+                            if (player != null && (team == player.Team || team == 5) && !player.Group.HasPermission(Permissions.mute))
                                 player.mute = true;
                         TShock.Utils.Broadcast(string.Format("The {0} team was muted for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                     }
@@ -117,7 +119,7 @@ namespace TeamCommands {
                     if (CommandIsValid(e, Permissions.mute, 2, "mute <team>")) {
                         var team = TeamColorToID(e.Parameters[1], e.Player);
                         foreach (TSPlayer player in TShock.Players)
-                            if (player != null && team == player.Team)
+                            if (player != null && (team == player.Team || team == 5))
                                 player.mute = false;
                         TShock.Utils.Broadcast(string.Format("The {0} team was unmuted by {1}.", TeamIDToColor(team), e.Player.Name), Color.Green);
                     }
@@ -131,7 +133,7 @@ namespace TeamCommands {
                         else {
                             var g = TShock.Utils.GetGroup(e.Parameters[2]);
                             foreach (TSPlayer player in TShock.Players)
-                                if (player != null && team == player.Team) {
+                                if (player != null && (team == player.Team || team == 5)) {
                                     player.tempGroup = g;
                                     player.SendSuccessMessage(string.Format("Your group has temporarily been changed to {0}", g.Name));
                                 }
@@ -148,7 +150,7 @@ namespace TeamCommands {
                         else {
                             var g = TShock.Utils.GetGroup(e.Parameters[2]);
                             foreach (TSPlayer player in TShock.Players)
-                                if (player != null && team == player.Team) {
+                                if (player != null && (team == player.Team || team == 5)) {
                                     player.Group = g;
                                     player.SendSuccessMessage(string.Format("Your group has been changed to {0}", g.Name));
                                 }
@@ -192,7 +194,7 @@ namespace TeamCommands {
 				                if (item.type >= 1 && item.type < Main.maxItemTypes) {
                                     var team = TeamColorToID(e.Parameters[2], e.Player);
                                     foreach (TSPlayer player in TShock.Players)
-                                        if (player != null && team == player.Team && (player.InventorySlotAvailable || (item.type > 70 && item.type < 75) || item.ammo > 0 || item.type == 58 || item.type == 184)) {
+                                        if (player != null && (team == player.Team || team == 5) && (player.InventorySlotAvailable || (item.type > 70 && item.type < 75) || item.ammo > 0 || item.type == 58 || item.type == 184)) {
                                             if (itemAmount == 0 || itemAmount > item.maxStack)
                                                 itemAmount = item.maxStack;
                                            player.GiveItem(item.type, item.name, item.width, item.height, itemAmount, prefix);
