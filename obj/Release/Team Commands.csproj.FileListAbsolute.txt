@@ -1,0 +1,5 @@
+C:\Users\Zak\Desktop\build\Team Commands.dll
+C:\Users\Zak\Desktop\build\Team Commands.pdb
+E:\Dropbox\TShock Mods\Team Commands\obj\Release\Team Commands.csprojResolveAssemblyReference.cache
+E:\Dropbox\TShock Mods\Team Commands\obj\Release\Team Commands.dll
+E:\Dropbox\TShock Mods\Team Commands\obj\Release\Team Commands.pdb
