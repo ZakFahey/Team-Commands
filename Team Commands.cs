@@ -43,16 +43,26 @@ namespace TeamCommands {
             }
         }
 
-        string TeamIDToColor(int ID) {
+        string TeamIDToColor(int ID, bool capitalize = true) {
+            string ret;
             switch (ID) {
-                case 0: return "the white team";
-                case 1: return "the red team";
-                case 2: return "the green team";
-                case 3: return "the blue team";
-                case 4: return "the yellow team";
-                case 5: return "everyone";
-                default: return "";
+                case 0: ret = "The white team";
+                    break;
+                case 1: ret = "The red team";
+                    break;
+                case 2: ret = "The green team";
+                    break;
+                case 3: ret = "The blue team";
+                    break;
+                case 4: ret = "The yellow team";
+                    break;
+                case 5: ret = "Everyone";
+                    break;
+                default: ret = "";
+                    break;
             }
+            if (!capitalize) ret = ret.ToLower();
+            return ret;
         }
 
         void TeamDo(CommandArgs e) {
@@ -68,7 +78,7 @@ namespace TeamCommands {
                             foreach (TSPlayer player in TShock.Players)
                                 if (player != null && (team == player.Team || team == 5))
                                     TShock.Utils.Kick(player, reason, !e.Player.RealPlayer, true, e.Player.Name);
-                            TShock.Utils.Broadcast(string.Format("The {0} team was kicked for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
+                            TShock.Utils.Broadcast(string.Format("{0} was kicked for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                         }
                     break;
 
@@ -82,7 +92,7 @@ namespace TeamCommands {
                                 var knownIps = JsonConvert.DeserializeObject<List<string>>(user.KnownIps);
                                 TShock.Bans.AddBan(knownIps.Last(), user.Name, user.UUID, reason, false, e.Player.UserAccountName);
                             }
-                        TShock.Utils.Broadcast(string.Format("The {0} team was banned for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
+                        TShock.Utils.Broadcast(string.Format("{0} was banned for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                     }
                     break;
 
@@ -100,7 +110,7 @@ namespace TeamCommands {
                             if (player != null && (team == player.Team || team == 5) && (!player.Group.HasPermission(Permissions.immunetoban) || e.Player.RealPlayer))
                                     if (TShock.Bans.AddBan(player.IP, player.Name, player.UUID, reason, false, e.Player.Name, DateTime.UtcNow.AddSeconds(time).ToString("s")))
                                         player.Disconnect(String.Format("Banned: {0}", reason));
-                        TShock.Utils.Broadcast(string.Format("The {0} team was banned for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
+                        TShock.Utils.Broadcast(string.Format("{0} was banned for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                     }
                     break;
 
@@ -137,7 +147,7 @@ namespace TeamCommands {
                                     player.tempGroup = g;
                                     player.SendSuccessMessage(string.Format("Your group has temporarily been changed to {0}", g.Name));
                                 }
-                            e.Player.SendSuccessMessage(string.Format("You have changed the {0} team's group to {1}", TeamIDToColor(team), g.Name));
+                            e.Player.SendSuccessMessage(string.Format("You have changed {0}'s group to {1}", TeamIDToColor(team, false), g.Name));
                         }
                     }
                     break;
@@ -154,7 +164,7 @@ namespace TeamCommands {
                                     player.Group = g;
                                     player.SendSuccessMessage(string.Format("Your group has been changed to {0}", g.Name));
                                 }
-                            e.Player.SendSuccessMessage(string.Format("You have changed the {0} team's group to {1}", TeamIDToColor(team), g.Name));
+                            e.Player.SendSuccessMessage(string.Format("You have changed {0}'s group to {1}", TeamIDToColor(team, false), g.Name));
                         }
                     }
                     break;
@@ -201,7 +211,7 @@ namespace TeamCommands {
                                            if (player != e.Player)
                                                 player.SendSuccessMessage(string.Format("{0} gave you {1} {2}(s).", e.Player.Name, itemAmount, item.name));
                                         }
-                                    e.Player.SendSuccessMessage(string.Format("Gave the {0} team {1} {2}(s).", TeamIDToColor(team), itemAmount, item.name));
+                                    e.Player.SendSuccessMessage(string.Format("Gave {0} {1} {2}(s).", TeamIDToColor(team, false), itemAmount, item.name));
                                 } else e.Player.SendErrorMessage("Invalid item type!");
                             }
                         }
@@ -215,7 +225,7 @@ namespace TeamCommands {
                                 player.Teleport(e.TPlayer.position.X, e.TPlayer.position.Y);
 								player.SendSuccessMessage(String.Format("You were teleported to {0}.", e.Player.Name));
                             }
-                        e.Player.SendSuccessMessage("Teleported the {0} team to yourself.", TeamIDToColor(team));
+                        e.Player.SendSuccessMessage("Teleported {0} to yourself.", TeamIDToColor(team, false));
                     }
                     break;
 
@@ -246,8 +256,8 @@ namespace TeamCommands {
                                                                             e.Player.Name, TShock.Utils.GetBuffName(id),
                                                                             TShock.Utils.GetBuffDescription(id), (time)));
                                 }
-                            e.Player.SendSuccessMessage(string.Format("You have buffed the {0} team with {1}({2}) for {3} seconds!",
-                                                                  TeamIDToColor(team), TShock.Utils.GetBuffName(id),
+                            e.Player.SendSuccessMessage(string.Format("You have buffed {0} with {1}({2}) for {3} seconds!",
+                                                                  TeamIDToColor(team, false), TShock.Utils.GetBuffName(id),
                                                                   TShock.Utils.GetBuffDescription(id), (time)));
                         } else e.Player.SendErrorMessage("Invalid buff ID!");
                     }
@@ -262,7 +272,7 @@ namespace TeamCommands {
                                 if (player != e.Player)
                                     player.SendSuccessMessage(string.Format("{0} just healed you!", e.Player.Name));
                             }
-                        e.Player.SendSuccessMessage(String.Format("You just healed the {0} team.", TeamIDToColor(team)));
+                        e.Player.SendSuccessMessage(String.Format("You just healed {0}.", TeamIDToColor(team, false)));
                     }
                     break;
 
@@ -322,7 +332,7 @@ namespace TeamCommands {
                                 if (player != null && player.Active && !player.Dead && player.Team == team)
                                     if (player.Teleport(warp.Position.X * 16, warp.Position.Y * 16) && player != e.Player)
                                         player.SendSuccessMessage(String.Format("{0} warped you to {1}.", e.Player.Name, e.Parameters[2]));
-                            e.Player.SendSuccessMessage(String.Format("You warped the {0} team to {1}.", TeamIDToColor(team), e.Parameters[2]));
+                            e.Player.SendSuccessMessage(String.Format("You warped {0} to {1}.", TeamIDToColor(team, false), e.Parameters[2]));
                         }
                         else e.Player.SendErrorMessage("Specified warp not found.");
                     }
