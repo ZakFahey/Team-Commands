@@ -121,7 +121,7 @@ namespace TeamCommands {
                         foreach (TSPlayer player in TShock.Players)
                             if (player != null && (team == player.Team || team == 5) && !player.Group.HasPermission(Permissions.mute))
                                 player.mute = true;
-                        TShock.Utils.Broadcast(string.Format("The {0} team was muted for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
+                        TShock.Utils.Broadcast(string.Format("{0} was muted for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                     }
                     break;
 
@@ -131,7 +131,7 @@ namespace TeamCommands {
                         foreach (TSPlayer player in TShock.Players)
                             if (player != null && (team == player.Team || team == 5))
                                 player.mute = false;
-                        TShock.Utils.Broadcast(string.Format("The {0} team was unmuted by {1}.", TeamIDToColor(team), e.Player.Name), Color.Green);
+                        TShock.Utils.Broadcast(string.Format("{0} was unmuted by {1}.", TeamIDToColor(team), e.Player.Name), Color.Green);
                     }
                     break;
 
