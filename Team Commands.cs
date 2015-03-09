@@ -8,7 +8,7 @@ using TerrariaApi.Server;
 using Newtonsoft.Json;
 
 namespace TeamCommands {
-    [ApiVersion(1, 16)]
+    [ApiVersion(1, 17)]
     public class TeamCommands : TerrariaPlugin {
         public TeamCommands(Main game) : base(game) {
         }
@@ -18,7 +18,7 @@ namespace TeamCommands {
             });
         }
         public override Version Version {
-            get { return new Version("1.0"); }
+            get { return new Version("1.0.1"); }
         }
         public override string Name {
             get { return "Team Commands"; }
@@ -218,7 +218,7 @@ namespace TeamCommands {
                     break;
 
                 case "tphere":
-                    if (CommandIsValid(e, Permissions.tphere, 2, "tphere <team>")) {
+                    if (CommandIsValid(e, Permissions.tpothers, 2, "tphere <team>")) {
                         var team = TeamColorToID(e.Parameters[1], e.Player);
                         foreach (TSPlayer player in TShock.Players)
                             if (player != null && player.Active && !player.Dead && player.Team == team && player != e.Player) {
@@ -282,7 +282,7 @@ namespace TeamCommands {
                         foreach (TSPlayer player in TShock.Players)
                             if (player != null && player.Active && !player.Dead && player.Team == team)
                                 player.DamagePlayer(999999);
-                        TSPlayer.All.SendInfoMessage("{0} killed the {1} team.", e.Player.Name, TeamIDToColor(team));
+                        TSPlayer.All.SendInfoMessage("{0} killed {1}.", e.Player.Name, TeamIDToColor(team, false));
                     }
                     break;
 
@@ -297,7 +297,7 @@ namespace TeamCommands {
                         foreach (TSPlayer player in TShock.Players)
                             if (player != null && player.Active && !player.Dead && player.Team == team)
                                 player.DamagePlayer(damage);
-                        TSPlayer.All.SendInfoMessage("{0} slapped the {1} team for {2} damage.", e.Player.Name, TeamIDToColor(team), damage);
+                        TSPlayer.All.SendInfoMessage("{0} slapped {1} for {2} damage.", e.Player.Name, TeamIDToColor(team, false), damage);
                     }
                     break;
 
@@ -324,7 +324,7 @@ namespace TeamCommands {
                     break;
 
                 case "sendwarp":
-                    if (CommandIsValid(e, Permissions.tphere, 3, "sendwarp <team> <warpname>")) {
+                    if (CommandIsValid(e, Permissions.tpothers, 3, "sendwarp <team> <warpname>")) {
                         var team = TeamColorToID(e.Parameters[1], e.Player);
                         var warp = TShock.Warps.Find(e.Parameters[2]);
                         if (warp.Position != Point.Zero) {
