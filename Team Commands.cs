@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TShockAPI;
 using Terraria;
 using TerrariaApi.Server;
 using Newtonsoft.Json;
+using Microsoft.Xna.Framework;
 
 namespace TeamCommands {
-    [ApiVersion(1, 17)]
+    [ApiVersion(2, 0)]
     public class TeamCommands : TerrariaPlugin {
         public TeamCommands(Main game) : base(game) {
         }
@@ -18,7 +18,7 @@ namespace TeamCommands {
             });
         }
         public override Version Version {
-            get { return new Version("1.0.1"); }
+            get { return new Version("1.1"); }
         }
         public override string Name {
             get { return "Team Commands"; }
@@ -90,7 +90,7 @@ namespace TeamCommands {
                             if (player != null && (team == player.Team || team == 5) && (!player.Group.HasPermission(Permissions.immunetoban) || e.Player.RealPlayer)) {
                                 var user = TShock.Users.GetUserByID(player.Index);
                                 var knownIps = JsonConvert.DeserializeObject<List<string>>(user.KnownIps);
-                                TShock.Bans.AddBan(knownIps.Last(), user.Name, user.UUID, reason, false, e.Player.UserAccountName);
+                                TShock.Bans.AddBan(knownIps.Last(), user.Name, user.UUID, reason, false, e.Player.User.Name);
                             }
                         TShock.Utils.Broadcast(string.Format("{0} was banned for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                     }
