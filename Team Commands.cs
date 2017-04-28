@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Microsoft.Xna.Framework;
 
 namespace TeamCommands {
-    [ApiVersion(2, 0)]
+    [ApiVersion(2, 1)]
     public class TeamCommands : TerrariaPlugin {
         public TeamCommands(Main game) : base(game) {
         }
@@ -18,7 +18,7 @@ namespace TeamCommands {
             });
         }
         public override Version Version {
-            get { return new Version("1.1"); }
+            get { return new Version("1.2"); }
         }
         public override string Name {
             get { return "Team Commands"; }
@@ -71,14 +71,14 @@ namespace TeamCommands {
 
                 case "kick":
                     if (CommandIsValid(e, Permissions.kick, 2, "kick <team> [reason]"))
-                        if (e.Parameters[1].Length == 0) e.Player.SendErrorMessage("Missing player name.");
+                        if (e.Parameters[1].Length == 0) e.Player.SendErrorMessage("Missing team name.");
                         else {
                             string reason = e.Parameters.Count > 2 ? String.Join(" ", e.Parameters.Skip(2)) : "Misbehavior.";
                             var team = TeamColorToID(e.Parameters[1], e.Player);
                             foreach (TSPlayer player in TShock.Players)
                                 if (player != null && (team == player.Team || team == 5))
                                     TShock.Utils.Kick(player, reason, !e.Player.RealPlayer, true, e.Player.Name);
-                            TShock.Utils.Broadcast(string.Format("{0} was kicked for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
+                                TShock.Utils.Broadcast(string.Format("{0} was kicked for '{1}'", TeamIDToColor(team), reason.ToLower()), Color.Green);
                         }
                     break;
 
@@ -198,7 +198,7 @@ namespace TeamCommands {
                             if (items.Count == 0)
                                 e.Player.SendErrorMessage("Invalid item type!");
                             else if (items.Count > 1)
-                                TShock.Utils.SendMultipleMatchError(e.Player, items.Select(i => i.name));
+                                TShock.Utils.SendMultipleMatchError(e.Player, items.Select(i => i.Name));
                             else {
                                 var item = items[0];
 				                if (item.type >= 1 && item.type < Main.maxItemTypes) {
@@ -207,11 +207,11 @@ namespace TeamCommands {
                                         if (player != null && (team == player.Team || team == 5) && (player.InventorySlotAvailable || (item.type > 70 && item.type < 75) || item.ammo > 0 || item.type == 58 || item.type == 184)) {
                                             if (itemAmount == 0 || itemAmount > item.maxStack)
                                                 itemAmount = item.maxStack;
-                                           player.GiveItem(item.type, item.name, item.width, item.height, itemAmount, prefix);
+                                           player.GiveItem(item.type, item.Name, item.width, item.height, itemAmount, prefix);
                                            if (player != e.Player)
-                                                player.SendSuccessMessage(string.Format("{0} gave you {1} {2}(s).", e.Player.Name, itemAmount, item.name));
+                                                player.SendSuccessMessage(string.Format("{0} gave you {1} {2}(s).", e.Player.Name, itemAmount, item.Name));
                                         }
-                                    e.Player.SendSuccessMessage(string.Format("Gave {0} {1} {2}(s).", TeamIDToColor(team, false), itemAmount, item.name));
+                                    e.Player.SendSuccessMessage(string.Format("Gave {0} {1} {2}(s).", TeamIDToColor(team, false), itemAmount, item.Name));
                                 } else e.Player.SendErrorMessage("Invalid item type!");
                             }
                         }
@@ -237,11 +237,12 @@ namespace TeamCommands {
                         int time = 60;
                         if (!int.TryParse(e.Parameters[2], out id)) {
                             var found = TShock.Utils.GetBuffByName(e.Parameters[2]);
-                            if (found.Count == 0)
-                                e.Player.SendErrorMessage("Invalid buff name!");
-                            else if (found.Count > 1)
-                                TShock.Utils.SendMultipleMatchError(e.Player, found.Select(b => Main.buffName[b]));
-                            else id = found[0];
+                                if (found.Count == 0)
+                                    e.Player.SendErrorMessage("Invalid buff name!");
+                                else if (found.Count > 1)
+                                    //TShock.Utils.SendMultipleMatchError(e.Player, found.Select(b => Main.buffName[b]));
+                                    TShock.Utils.SendMultipleMatchError(e.Player, found.Select(b => Lang.GetBuffName(b)));
+                                else id = found[0];
                         }
                         if (e.Parameters.Count == 4)
                             int.TryParse(e.Parameters[3], out time);
